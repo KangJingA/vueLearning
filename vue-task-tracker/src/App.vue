@@ -41,47 +41,74 @@ export default {
     toggleAddTask() {
       this.showAddTask = !this.showAddTask;
     },
-    addTask(newTask) {
-      console.log("this is clicked");
-      console.log(newTask);
+    async addTask(newTask) {
+      const res = await fetch("api/tasks", {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify(newTask),
+      });
+
+      const data = await res.json();
       this.tasks.push(newTask);
-      // this.tasks = [...this.tasks, newTask];
     },
-    deleteTask(id) {
+    async deleteTask(id) {
       // if (confirm("Are you sure?")) {
       //   console.log("task", id);
       //   this.tasks = this.tasks.filter((task) => task.id !== id);
       // }
-      this.tasks = this.tasks.filter((task) => task.id !== id);
+      const res = await fetch(`api/tasks/${id}`, {
+        method: "DELETE",
+      });
+
+      res.status === 200
+        ? (this.tasks = this.tasks.filter((task) => task.id !== id))
+        : alert("Error deleting task");
     },
-    toggleReminder(id) {
+    async toggleReminder(id) {
+      const taskToToggle = await this.fetchTask(id);
+      const updatedTask = { ...taskToToggle, reminder: !taskToToggle.reminder };
+
+      const res = await fetch(`api/tasks/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify(updatedTask),
+      });
+
+      const data = await res.json();
       this.tasks = this.tasks.map((task) =>
         task.id === id
           ? {
               ...task,
-              reminder: !task.reminder,
+              reminder: data.reminder,
             }
           : task
       );
     },
+    // fetch data from the server
+    // api is a proxy
+    async fetchTasks() {
+      const res = await fetch("api/tasks");
+      const data = await res.json();
+
+      return data;
+    },
+    // fetch single task
+    async fetchTask(id) {
+      const res = await fetch(`api/tasks/${id}`);
+      const data = await res.json();
+
+      return data;
+    },
   },
   // method that runs when the component is created
   // still need to define the data in data() first
-  created() {
-    this.tasks = [
-      {
-        id: 1,
-        text: "Doctor's Appointment",
-        day: "Monday",
-        reminder: true,
-      },
-      {
-        id: 2,
-        text: "Buy food",
-        day: "Monday",
-        reminder: false,
-      },
-    ];
+  async created() {
+    console.log("component created");
+    this.tasks = await this.fetchTasks();
   },
 };
 </script>
