@@ -1,5 +1,7 @@
 // v-bind tasks cos its dynamic // when the tasks array changes, component
 should rerender // v-if, v-show conditional rendering // directives! v-whatever
+// want to show the header and footer on every page
+
 <template>
   <div class="container">
     <Header
@@ -7,33 +9,24 @@ should rerender // v-if, v-show conditional rendering // directives! v-whatever
       title="Task Tracker"
       :showAddTask="showAddTask"
     />
-    <div v-show="showAddTask">
-      <AddTask @add-task="addTask" />
-    </div>
-    <Tasks
-      @toggle-reminder="toggleReminder"
-      @delete-task="deleteTask"
-      :tasks="tasks"
-    />
+    <router-view :showAddTask="showAddTask"></router-view>
+    <Footer />
   </div>
 </template>
 
 <script>
 import Header from "./components/Header"; // 1. import the component
-import Tasks from "./components/Tasks.vue";
-import AddTask from "./components/AddTask.vue";
+import Footer from "./components/Footer.vue";
 
 export default {
   name: "App",
   components: {
     // declare component in the export default
     Header,
-    Tasks,
-    AddTask,
+    Footer,
   },
   data() {
     return {
-      tasks: [],
       showAddTask: false,
     };
   },
@@ -41,74 +34,6 @@ export default {
     toggleAddTask() {
       this.showAddTask = !this.showAddTask;
     },
-    async addTask(newTask) {
-      const res = await fetch("api/tasks", {
-        method: "POST",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify(newTask),
-      });
-
-      const data = await res.json();
-      this.tasks.push(newTask);
-    },
-    async deleteTask(id) {
-      // if (confirm("Are you sure?")) {
-      //   console.log("task", id);
-      //   this.tasks = this.tasks.filter((task) => task.id !== id);
-      // }
-      const res = await fetch(`api/tasks/${id}`, {
-        method: "DELETE",
-      });
-
-      res.status === 200
-        ? (this.tasks = this.tasks.filter((task) => task.id !== id))
-        : alert("Error deleting task");
-    },
-    async toggleReminder(id) {
-      const taskToToggle = await this.fetchTask(id);
-      const updatedTask = { ...taskToToggle, reminder: !taskToToggle.reminder };
-
-      const res = await fetch(`api/tasks/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify(updatedTask),
-      });
-
-      const data = await res.json();
-      this.tasks = this.tasks.map((task) =>
-        task.id === id
-          ? {
-              ...task,
-              reminder: data.reminder,
-            }
-          : task
-      );
-    },
-    // fetch data from the server
-    // api is a proxy
-    async fetchTasks() {
-      const res = await fetch("api/tasks");
-      const data = await res.json();
-
-      return data;
-    },
-    // fetch single task
-    async fetchTask(id) {
-      const res = await fetch(`api/tasks/${id}`);
-      const data = await res.json();
-
-      return data;
-    },
-  },
-  // method that runs when the component is created
-  // still need to define the data in data() first
-  async created() {
-    console.log("component created");
-    this.tasks = await this.fetchTasks();
   },
 };
 </script>
