@@ -30,6 +30,7 @@ export default {
   },
   emits: ["toggle-add-task"],
   // used for reactivity
+  // return computed properties based on present properties 
   computed: {
     homePage() {
       // access the router
@@ -52,3 +53,6 @@ header {
   margin-bottom: 20px;
 }
 </style>
+                                          
+// watch 
+// only use when you need to perform some action when a property changes                                       
