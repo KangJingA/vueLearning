@@ -29,7 +29,7 @@ header {
 	border-radius: 0 20px 20px 0;
 	background-color: #7c5dfa;
 	justify-content: center;
-	padding: 24px;
+	padding: 15px;
 	@media (min-width: 900px) {
 		width: 100%;
 	}
