@@ -33,6 +33,9 @@ const store = createStore({
 			state.counter -= payload
 			state.history.push(state.counter)
 		},
+		isLoading(state) {
+			state.loading = !state.loading
+		},
 	},
 	// contains methods for actions
 	// perform the action (call some async code)
@@ -41,7 +44,9 @@ const store = createStore({
 	// dispatch?
 	actions: {
 		async addRandomNumber(context) {
+			context.commit("isLoading")
 			// fetch random number from API
+
 			let data = await axios.get(
 				"https://www.random.org/integers/?num=1&min=-1000&max=1000&col=1&base=10&format=plain&rnd=new"
 			)
@@ -51,6 +56,8 @@ const store = createStore({
 			// contains commit. which allows u to call specfic mutation
 			// mutation name and payload
 			context.commit("addToCounter", payload)
+			// fetch random number from API
+			context.commit("isLoading")
 		},
 	},
 	// way to manipulate data into another way

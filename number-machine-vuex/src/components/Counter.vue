@@ -1,14 +1,14 @@
 <template>
 	<div>
 		<h1>Vuex Number Machine</h1>
-		<h1 class="counter">{{ counter }}</h1>
+		<h1 class="counter">{{ loading ? "Loading..." : counter }}</h1>
 		<button @click="substractFromCounter(parseInt(counterValue))">-</button>
 		<!-- v-model creates a 2 way binding between the state and the element -->
 		<input type="number" v-model="counterValue" />
 		<button @click="addToCounter(parseInt(counterValue))">+</button>
 		<div>
 			<button class="btn" @click="addRandomNumber">
-				Add a random number
+				{{ loading ? "Loading..." : "Add a random number" }}
 			</button>
 		</div>
 	</div>
@@ -28,7 +28,7 @@ export default {
 		// this returns you the states that you want from the store
 		// specified in the array
 		// now counter is destructured and you have access to it
-		...mapState(["counter"]),
+		...mapState(["counter", "loading"]),
 	},
 	methods: {
 		// destructure methods from the mutations.
